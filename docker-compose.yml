@@ -1,0 +1,13 @@
+# LOCAL TESTING ONLY (Day 4). Not used on the VM. Note: our RDS database only accepts
+# connections from the VM, so on a laptop point .env at a local test PostgreSQL instead.
+services:
+  air-ingest:
+    build: { context: ., dockerfile: Dockerfile }
+    env_file: .env
+  traffic-ingest:
+    build: { context: ., dockerfile: Dockerfile.traffic }
+    env_file: .env
+  dashboard:
+    build: { context: ., dockerfile: Dockerfile.dashboard }
+    env_file: .env
+    ports: ["8000:8000"]

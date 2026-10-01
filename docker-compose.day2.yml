@@ -1,0 +1,28 @@
+# DAY 2 LAB ONLY (local laptop): the two ingestion containers publish to a shared Redis queue.
+# Not used on the VM: Day 3 drops the queue (see ADR-002 and ADR-004).
+# Run:    docker compose -f docker-compose.day2.yml up --build
+# Check:  docker exec -it redis redis-cli LRANGE readings 0 -1
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    networks: [airbreda]
+
+  air-ingest:
+    build: { context: ., dockerfile: Dockerfile }
+    container_name: air-ingest
+    env_file: .env
+    environment: { REDIS_HOST: redis }
+    depends_on: [redis]
+    networks: [airbreda]
+
+  traffic-ingest:
+    build: { context: ., dockerfile: Dockerfile.traffic }
+    container_name: traffic-ingest
+    env_file: .env
+    environment: { REDIS_HOST: redis }
+    depends_on: [redis]
+    networks: [airbreda]
+
+networks:
+  airbreda:

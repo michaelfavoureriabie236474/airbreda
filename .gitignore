@@ -1,0 +1,12 @@
+# Secrets: NEVER commit these
+.env
+*.pem
+*.csv.local
+
+# Local test output
+data/
+__pycache__/
+.pytest_cache/
+.venv/
+out/
+STUDY_NOTES.md

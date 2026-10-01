@@ -1,0 +1,8 @@
+# Used by the trainer image AND the dashboard image. Same pinned versions in both, so the
+# model is trained and loaded with the identical scikit-learn (one cause of training-serving skew).
+-r requirements.txt
+scikit-learn==1.8.0
+numpy==2.4.4
+joblib==1.5.3
+fastapi==0.142.2
+uvicorn==0.46.0

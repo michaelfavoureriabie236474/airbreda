@@ -1,0 +1,10 @@
+# Container 3: dashboard (image: airbreda-dashboard), runs permanently on port 8000.
+# model.pkl is baked in: copy out/model.pkl to the project folder before building.
+# Build: docker build -t airbreda-dashboard -f Dockerfile.dashboard .
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt requirements-ml.txt ./
+RUN pip install --no-cache-dir -r requirements-ml.txt
+COPY common.py storage.py predict.py dashboard.py model.pkl ./
+EXPOSE 8000
+CMD ["uvicorn", "dashboard:app", "--host", "0.0.0.0", "--port", "8000"]

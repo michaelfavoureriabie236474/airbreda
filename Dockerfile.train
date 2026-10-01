@@ -1,0 +1,9 @@
+# Trainer (image: airbreda-trainer). NOT a long-running service: run it, it writes
+# out/training_data.csv, out/model.pkl and out/model_report.json, then exits.
+# Build: docker build -t airbreda-trainer -f Dockerfile.train .
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt requirements-ml.txt ./
+RUN pip install --no-cache-dir -r requirements-ml.txt
+COPY common.py storage.py build_training_data.py train_model.py ./
+CMD ["sh", "-c", "python build_training_data.py && python train_model.py"]
