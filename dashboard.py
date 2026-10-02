@@ -399,7 +399,7 @@ footer p{margin:0;max-width:560px}
  </div>
  <div class="fig">
   <div><span class="v sk" id="f-total">0,000</span><span class="u">vehicles/hour</span></div>
-  <p><span class="key" style="background:var(--traffic)"></span><span class=em>Traffic</span> on all four sensors together <span id="f-total-when"></span></p>
+  <p><span class="key" style="background:var(--traffic)"></span><span class=em>Traffic</span>: vehicles per hour on all four sensors added together <span id="f-total-when"></span></p>
  </div>
 </div>
 <p class="note-small measure" style="margin-top:12px">How to read these: NO₂ is an average over a whole hour, so "hour ending 10:00" means 09:00 to 10:00. Traffic is a snapshot of one minute, because NDW only publishes the current minute. Times are shown in Amsterdam time; the system stores everything in UTC, the world clock, which is 2 hours behind in summer.</p>
@@ -641,9 +641,9 @@ function drawModel(){
  const M=HIST&&HIST.model;if(!M){$("model").innerHTML="<p>The model is not available right now. The measured values above still update every hour.</p>";return}
  const per1000=M.coef_traffic*1000,neg=per1000<0;
  $("model").innerHTML=`<p>The model is a straight line: it predicts NO₂ from the total traffic and the hour of the day. Right now it says that every extra 1,000 vehicles an hour ${neg?"<span class=em>lowers</span>":"<span class=em>raises</span>"} NO₂ by <span class=em>${fmt(Math.abs(per1000),1)} µg/m³</span>.</p>`+
- (neg?`<p>That direction is not believable yet. It comes from very few hours, most of them at night, when traffic falls but still air can keep pollution near the ground. A handful of odd hours is enough to flip the line.</p>`:`<p>That is the direction you would expect, but it rests on very few hours. Weather, wind and weekends are not in the model yet.</p>`)+
+ (neg?`<p>That direction is not reliable yet. It comes from very few hours, most of them at night. Earlier today, two extra hours were enough to flip the direction of this line, so the estimate is unstable and the direction cannot be told yet.</p>`:`<p>That is the direction you would expect, but it is not reliable yet. Earlier today, two extra hours were enough to flip the direction of this line, so the estimate is unstable. Weather, wind and weekends are not in the model yet.</p>`)+
  `<p><span class=em>Honest answer:</span> the pipeline works end to end, but it needs weeks of data before it can answer the question.</p>
- <div class="eq">NO₂ = ${fmt(M.intercept,1)} ${M.coef_traffic<0?"−":"+"} ${fmt(Math.abs(per1000),2)} × thousand vehicles/hour ${M.coef_hour<0?"−":"+"} ${fmt(Math.abs(M.coef_hour),2)} × hour of day (UTC)</div>`;
+ <div class="eq">In plain numbers: start at ${fmt(M.intercept,1)} µg/m³, ${M.coef_traffic<0?"take off":"add"} ${fmt(Math.abs(per1000),1)} for every 1,000 vehicles an hour, and ${M.coef_hour<0?"take off":"add"} ${fmt(Math.abs(M.coef_hour),2)} for every hour later in the day (UTC clock).</div>`;
 }
 function drawHealth(){
  const h=HEALTH,rows=[["luchtmeetnet","Air collector","Luchtmeetnet NO₂ into the database"],["ndw","Traffic collector","NDW traffic into file storage"]];
