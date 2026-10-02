@@ -369,21 +369,7 @@ h2{font:500 clamp(28px,3.2vw,36px)/1.15 Newsreader,Georgia,serif;letter-spacing:
 .hrow .w{font-size:14px;color:var(--ink-2)}
 .hrow .r{text-align:right;font-size:14px;color:var(--ink-2)}
 .hrow .r .em{display:block;color:var(--ink)}
-/* developer */
-details{margin-top:72px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
-summary{cursor:pointer;padding:16px 0;font:500 20px Newsreader,Georgia,serif;list-style:none;display:flex;justify-content:space-between;align-items:center}
-summary::-webkit-details-marker{display:none}
-summary::after{content:"+";font:400 24px "Atkinson Hyperlegible",sans-serif;color:var(--ink-2)}
-details[open] summary::after{content:"−"}
-summary:focus-visible{outline:2px solid var(--actual);outline-offset:4px}
-.dev{padding:0 0 22px}
-.dev p{color:var(--ink-2);margin:0 0 12px;font-size:15px}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.tabs button{border:1px solid var(--rule);background:transparent;padding:5px 12px;border-radius:999px;cursor:pointer;font-size:13.5px}
-.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-pre{margin:0;background:var(--paper-2);padding:16px;font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:auto;border-radius:4px}
-.jk{color:var(--actual)}.js{color:var(--traffic)}.jn{color:var(--pred)}.jl{color:var(--ink-3)}
-footer{margin-top:56px;padding-top:18px;border-top:2px solid var(--ink);display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-2)}
+footer{margin-top:72px;padding-top:0;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-2)}
 footer p{margin:0;max-width:560px}
 .sk{color:transparent!important;background:var(--paper-2);border-radius:4px}
 @media (max-width:860px){.figs{grid-template-columns:1fr}.fig,.fig+.fig{padding:18px 0;border-left:0}.fig+.fig{border-top:1px solid var(--rule)}.junction,.two{grid-template-columns:1fr;gap:28px}h1{margin-top:36px}}
@@ -425,9 +411,17 @@ footer p{margin:0;max-width:560px}
   <span style="font-size:13px;color:var(--ink-3)">Open circles are suspicious readings: kept, not used for training</span>
  </div>
  <div class="chart" id="c-no2"></div>
+ <p class="note-small" style="margin:6px 0 0">The red line is the EU annual limit of 40 µg/m³, used here to mark the hours that push the yearly average up. The EU hourly limit is 200 µg/m³, far above every hour measured here. From 2030 the annual limit drops to 20.</p>
  <div class="sub-h"><span class="key" style="background:var(--traffic)"></span>Vehicles per hour, four sensors combined</div>
  <div class="chart" id="c-traffic"></div>
  <div class="tip" id="tip"></div>
+</section>
+
+<section aria-labelledby="h-scatter">
+ <h2 id="h-scatter">Traffic against NO₂</h2>
+ <p class="dek measure">Each dot is one hour where we have both numbers. If more traffic meant more NO₂, the dots would rise from left to right. The dotted line is what the model learned.</p>
+ <div class="chart" id="c-scatter"></div>
+ <p class="note-small" id="scatter-note"></p>
 </section>
 
 <section aria-labelledby="h-junction">
@@ -448,21 +442,13 @@ footer p{margin:0;max-width:560px}
   </div>
   <div>
    <h2 style="font-size:26px">Is the system running?</h2>
-   <p class="dek" style="font-size:15px">Each hourly run records its result in the database.</p>
+   <p class="dek" style="font-size:15px">Each hourly run records its result in the database. <a href="/health" target="_blank" rel="noopener">Open the raw health check</a></p>
    <div id="health"></div>
   </div>
  </div>
 </section>
 
-<details id="devbox">
- <summary>For developers: the API behind this page</summary>
- <div class="dev">
-  <p>This page is just another client of the public API. These are the exact responses it uses.</p>
-  <div class="tabs" id="tabs"></div>
-  <pre id="json">Loading…</pre>
-  <p style="margin-top:10px"><a id="rawlink" href="/site/hrl" target="_blank" rel="noopener">Open this response on its own</a></p>
- </div>
-</details>
+
 
 <footer>
  <p>Air quality: Luchtmeetnet (RIVM), station NL10240 Breda-Tilburgseweg. Traffic: NDW, the Dutch national road traffic data portal. Collected hourly on one AWS server in Stockholm, inside the EU.</p>
@@ -474,7 +460,7 @@ footer p{margin:0;max-width:560px}
 (function(){
 const SITES=["hrl","hrr","vwd","vwa"];
 const INFO={hrl:{name:"Main road, left carriageway",short:"Main road (L)"},hrr:{name:"Main road, right carriageway",short:"Main road (R)"},vwd:{name:"On-ramp, traffic joining",short:"On-ramp"},vwa:{name:"Off-ramp, traffic leaving",short:"Off-ramp"}};
-const TZ="Europe/Amsterdam";let RANGE=48,HIST=null,SEL="hrl",SD={},HEALTH=null,DEVTAB="site";
+const TZ="Europe/Amsterdam";let RANGE=48,HIST=null,SEL="hrl",SD={},HEALTH=null;
 const $=id=>document.getElementById(id);
 const fmt=(v,d=0)=>(v===null||v===undefined||isNaN(v))?"n/a":Number(v).toLocaleString("en-GB",{minimumFractionDigits:d,maximumFractionDigits:d});
 const tm=t=>new Date(t).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:TZ});
@@ -578,7 +564,30 @@ function hover(t){
  const sec=tip.parentElement.getBoundingClientRect(),c=$("c-no2").getBoundingClientRect();let left=c.left-sec.left+x+16;if(left+210>sec.width)left=c.left-sec.left+x-226;
  tip.style.left=Math.max(0,left)+"px";tip.style.top=(c.top-sec.top+8)+"px";tip.style.opacity=1;
 }
-function drawCharts(){drawNO2();drawTraffic()}
+
+function drawScatter(){
+ const box=$("c-scatter");if(!box)return;box.innerHTML="";if(!HIST){return}
+ const tot={};HIST.traffic.forEach(p=>{if(p.total!=null)tot[p.t]=p.total});
+ const pts=HIST.no2.filter(p=>p.value!=null&&!p.flagged&&tot[p.t]!=null).map(p=>({x:tot[p.t],y:p.value,t:p.t}));
+ if(pts.length<2){box.innerHTML='<div class="empty">Not enough matching hours yet.</div>';$("scatter-note").textContent="";return}
+ const W=box.clientWidth,H=Math.max(240,Math.min(320,W*.3)),m={l:40,r:16,t:12,b:40};
+ const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,height:H,role:"img","aria-label":"Scatter of traffic against NO2 per hour"},box);
+ const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y),M=HIST.model;
+ let x0=Math.min(...xs),x1=Math.max(...xs);const pad=(x1-x0)*.08||100;x0=Math.max(0,x0-pad);x1+=pad;
+ const yst=niceStep(Math.max(...ys,thr())),ymax=yst*Math.ceil(Math.max(...ys)*1.1/yst);
+ const X=v=>m.l+(v-x0)/(x1-x0)*(W-m.l-m.r),Y=v=>m.t+(1-v/ymax)*(H-m.t-m.b);
+ const g=el("g",{class:"axis"},svg);
+ for(let v=0;v<=ymax+1e-9;v+=yst){el("line",{x1:m.l,x2:W-m.r,y1:Y(v),y2:Y(v),stroke:css("--rule"),"stroke-width":v===0?1.5:1},g);const t=el("text",{x:m.l-8,y:Y(v)+4,"text-anchor":"end"},g);t.textContent=fmt(v)}
+ const xst=niceStep(x1-x0);for(let v=Math.ceil(x0/xst)*xst;v<=x1;v+=xst){const t=el("text",{x:X(v),y:H-22,"text-anchor":"middle"},g);t.textContent=v>=1000?fmt(v/1000,1)+"k":fmt(v)}
+ const xl=el("text",{x:(m.l+W-m.r)/2,y:H-4,"text-anchor":"middle"},g);xl.textContent="Vehicles per hour, four sensors combined";
+ const yl=el("text",{x:m.l,y:m.t-2,"text-anchor":"start"},g);yl.textContent="";
+ if(M){const hrs=pts.map(p=>new Date(p.t).getUTCHours()),mh=hrs.reduce((a,b)=>a+b,0)/hrs.length,f=x=>M.intercept+M.coef_traffic*x+M.coef_hour*mh;
+  el("line",{x1:X(x0),y1:Y(Math.max(0,f(x0))),x2:X(x1),y2:Y(Math.max(0,f(x1))),stroke:css("--pred"),"stroke-width":2.25,"stroke-dasharray":"1 5","stroke-linecap":"round"},svg)}
+ pts.forEach(p=>{const c=el("circle",{cx:X(p.x),cy:Y(p.y),r:5,fill:css("--actual"),"fill-opacity":.85,stroke:css("--paper"),"stroke-width":1.5},svg);const tt=el("title",{},c);tt.textContent=`${dtm(p.t)}: ${fmt(p.x)} vehicles/hour, ${fmt(p.y,1)} µg/m³ NO₂`});
+ const per=M?M.coef_traffic*1000:null;
+ $("scatter-note").textContent=`${pts.length} matching hours. `+(per==null?"":`The model's line: ${per<0?"minus":"plus"} ${fmt(Math.abs(per),1)} µg/m³ for every extra 1,000 vehicles an hour. With this few hours, one or two dots can tilt the line.`);
+}
+function drawCharts(){drawNO2();drawTraffic();drawScatter()}
 
 /* ---------- junction map ---------- */
 function intensity(s){const L=HIST&&HIST.sites_latest&&HIST.sites_latest[s];return (SD[s]&&SD[s].intensity_veh_per_hr)??(L&&L.intensity_veh_per_hr)??null}
@@ -642,23 +651,14 @@ function drawHealth(){
  const ok=h&&h.status==="ok";$("pulse").className="pulse"+(ok?"":" off");
 }
 
-/* ---------- developer panel ---------- */
-function hl(o){return JSON.stringify(o,null,2).replace(/("(?:\\.|[^"\\])*")(\s*:)?|\b(-?\d+\.?\d*(?:e[+-]?\d+)?)\b|\bnull\b|\btrue\b|\bfalse\b/g,(m,s,c,n)=>s?(c?`<span class="jk">${s}</span>${c}`:`<span class="js">${s}</span>`):n!==undefined?`<span class="jn">${m}</span>`:`<span class="jl">${m}</span>`)}
-function drawDev(){
- const tabs=[...SITES.map(s=>["site/"+s,"/site/"+s]),["health","/health"]];
- $("tabs").innerHTML=tabs.map(([k,l])=>`<button data-k="${k}" aria-pressed="${(DEVTAB==="site"?"site/"+SEL:DEVTAB)===k}">GET ${l}</button>`).join("");
- $("tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(k.startsWith("site/")){SEL=k.slice(5);DEVTAB="site";drawMap();drawSide()}else DEVTAB=k;drawDev()});
- const cur=DEVTAB==="site"?SD[SEL]:HEALTH,path=DEVTAB==="site"?"/site/"+SEL:"/health";$("json").innerHTML=cur?hl(cur):"Loading…";$("rawlink").href=path;
-}
-
-function drawAll(){drawFigures();drawCharts();drawMap();drawSide();drawModel();drawHealth();drawDev()}
+function drawAll(){drawFigures();drawCharts();drawMap();drawSide();drawModel();drawHealth()}
 
 async function load(){
  try{const [sites,h]=await Promise.all([Promise.all(SITES.map(s=>j("/site/"+s).catch(()=>null))),j("/health").catch(()=>null)]);
   SITES.forEach((s,i)=>{if(sites[i])SD[s]=sites[i]});HEALTH=h;
   $("livetxt").textContent="Live, updated "+new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:TZ});
  }catch(e){$("livetxt").textContent="Offline, retrying every minute";$("pulse").className="pulse off"}
- drawFigures();drawMap();drawSide();drawHealth();drawDev();
+ drawFigures();drawMap();drawSide();drawHealth();
  try{HIST=await j("/history?hours=48");$("gen").textContent="Times are Amsterdam time. Chart data from "+tm(HIST.generated_at)+".";drawAll()}
  catch(e){$("c-no2").innerHTML='<div class="empty">The hour-by-hour history could not be loaded. The live figures above still work; this retries every minute.</div>'}
 }
