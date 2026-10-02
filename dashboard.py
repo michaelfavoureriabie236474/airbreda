@@ -402,6 +402,7 @@ footer p{margin:0;max-width:560px}
   <p><span class="key" style="background:var(--traffic)"></span><span class=em>Traffic</span> on all four sensors together <span id="f-total-when"></span></p>
  </div>
 </div>
+<p class="note-small measure" style="margin-top:12px">How to read these: NO₂ is an average over a whole hour, so "hour ending 10:00" means 09:00 to 10:00. Traffic is a snapshot of one minute, because NDW only publishes the current minute. Times are shown in Amsterdam time; the system stores everything in UTC, the world clock, which is 2 hours behind in summer.</p>
 
 <section aria-labelledby="h-time">
  <h2 id="h-time">Hour by hour</h2>
@@ -414,6 +415,7 @@ footer p{margin:0;max-width:560px}
  <p class="note-small" style="margin:6px 0 0">The red line is the EU annual limit of 40 µg/m³, used here to mark the hours that push the yearly average up. The EU hourly limit is 200 µg/m³, far above every hour measured here. From 2030 the annual limit drops to 20.</p>
  <div class="sub-h"><span class="key" style="background:var(--traffic)"></span>Vehicles per hour, four sensors combined</div>
  <div class="chart" id="c-traffic"></div>
+ <p class="note-small measure" style="margin-top:8px">Each bar is the traffic in the minute before the hour, rounded to that hour so it can be paired with the NO₂ hour. The expected line only starts on Thursday evening because that is when traffic collection began; NO₂ goes back further because the air station sends its last 50 hours every time.</p>
  <div class="tip" id="tip"></div>
 </section>
 
