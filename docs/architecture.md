@@ -5,17 +5,11 @@
 **Live system:** http://16.171.236.39:8000 (`/`, `/site/{site_id}`, `/health`)  
 **Date:** 3 October 2026
 
----
-
 ## 1. Architecture as deployed
 
 ![AirBreda overview: Luchtmeetnet and NDW feed two containers started by cron, which write to PostgreSQL and S3; the trainer and the dashboard read both, and users reach the dashboard on port 8000](airbreda_flow.png)
 
 *Figure 1. How data flows through AirBreda on AWS eu-north-1 (Stockholm).*
-
-![AirBreda in detail: containers, storage, firewall rules, permissions and costs](airbreda_architecture.png)
-
-*Figure 2. The same system in detail, with security groups, the IAM role and costs.*
 
 I run everything on one small EC2 virtual machine. Every hour, cron starts two containers. The first fetches NO₂ from Luchtmeetnet and writes it to PostgreSQL on RDS. The second downloads the national NDW traffic file, keeps my four A27 sensors, and saves one CSV per sensor plus the raw file to S3. A third container, the dashboard, runs permanently on port 8000. It reads both stores, applies the model and serves the page and the API. I train the model by hand with a separate trainer image.
 
@@ -30,8 +24,6 @@ I run everything on one small EC2 virtual machine. Every hour, cron starts two c
 | Secrets | only on the VM | `.env` (chmod 600), in `.gitignore`, never in Git or an image |
 
 The Day 2 Redis queue is not deployed (see ADR-002 and ADR-004). docker-compose is for local testing only.
-
----
 
 ## 2. Architecture Decision Records
 
@@ -149,8 +141,6 @@ The Day 2 Redis queue is not deployed (see ADR-002 and ADR-004). docker-compose 
 
 **The dashboard.** It shows a sentence rewritten every hour from live data, the current measured and expected NO₂ and traffic, an hour-by-hour chart, a scatter chart of traffic against NO₂ with the model's line, a map of the junction, the model in plain words, and the health of both collectors. The page uses the same API as everyone else, so the page and the API can't disagree.
 
----
-
 ## 3. Trade-offs
 
 **Storage.** I compared DynamoDB, a database on its own, and PostgreSQL plus S3. I chose PostgreSQL for structured NO₂ rows (about 8,760 a year) and S3 for files at $0.023 per GB-month. I gave up DynamoDB's scaling, which I don't need, and accepted that traffic lives in files rather than a table.
@@ -160,8 +150,6 @@ The Day 2 Redis queue is not deployed (see ADR-002 and ADR-004). docker-compose 
 **Messaging.** I compared Redis (built on Day 2), SQS and direct writes. I chose direct writes, because with one consumer and hourly jobs a broker is cost without benefit. I gave up decoupling, so adding a consumer means changing the collectors.
 
 **Disaster recovery.** I compared Backup & Restore, Pilot Light, Warm Standby and Multi-AZ. I chose Backup & Restore, with about an hour to recover. Multi-AZ would roughly double the database cost for availability an information dashboard doesn't need.
-
----
 
 ## 4. Cloud provider rationale (for a policy officer at the Municipality of Breda)
 
@@ -174,8 +162,6 @@ What would the municipality lose by moving to another provider, such as Microsof
 The main risk isn't the technology but the cost. Cloud bills grow quietly when nobody watches them. For a production service I would set a budget alert, add automatic backups to a second location, and review the costs once a month.
 
 *(about 280 words)*
-
----
 
 ## 5. Cost estimate (AWS Stockholm, on-demand, USD per month)
 
@@ -191,8 +177,6 @@ Prices from the AWS price list for Stockholm (1 October 2026): EC2 t3.micro $0.0
 **Assumptions.** A corridor is one air station plus four traffic sensors. The NDW file is national, so I download it once an hour however many corridors there are; extra corridors mostly add uploads of small CSV files. Storage grows month by month; the table shows the first month. My account runs on Free plan credits, so my actual bill is $0.
 
 **Does one VM still work?** At 10 corridors, yes: it is still seconds of work per hour. At 50 corridors with 5-minute updates, no. I would move to Fargate, EventBridge Scheduler and SQS, and make the database Multi-AZ because more people would depend on it.
-
----
 
 ## 6. Reflection
 

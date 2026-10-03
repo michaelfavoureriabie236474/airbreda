@@ -8,6 +8,8 @@ Is traffic on the A27 near Breda linked to NO₂ (nitrogen dioxide) in the air? 
 
 Author: Michael Favour Eriabie (236474), BUas ADSAI Year 3, elective System Design & Cloud Platforms.
 
+I set up the AWS account and every resource myself (EC2, RDS, S3, IAM, security groups), deployed the containers and ran the system. I used Claude as an assistant to explain concepts, review my code and help me write up; it had no access to my AWS account.
+
 ## How it works
 
 ![AirBreda architecture](docs/airbreda_flow.png)
@@ -43,10 +45,10 @@ requirements.txt        collectors
 requirements-ml.txt     pinned versions shared by trainer and dashboard
 docker-compose.yml      local testing only
 docker-compose.day2.yml Day 2 lab: collectors + Redis queue (local only, not deployed)
-DEPLOY.md               step-by-step deployment on the VM
+DEPLOY.md               my deployment runbook
 .env.example            template for the secrets file (.env is never committed)
 tests/                  pytest: Day 1 filter, bad-data handlers, model
-docs/                   Architecture Design Document and infographic
+docs/                   Architecture Design Document (.md and PDF) and diagrams
 ```
 
 ## Run the tests

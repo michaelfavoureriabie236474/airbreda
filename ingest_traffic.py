@@ -58,7 +58,7 @@ MEASUREMENT_FILE = "snelheden_en_intensiteiten_meetgegevens.xml.gz"
 
 # Site label -> NDW measurement site ID. All four are at the same point on the A27 just north of
 # Breda (about 51.592 N, 4.829 E); NDW's own configuration labels them mainCarriageway (hrl, hrr),
-# entrySlipRoad (vwd) and exitSlipRoad (vwa). CONFIRM against the course README's mapping.
+# entrySlipRoad (vwd) and exitSlipRoad (vwa). I matched them by road position (0063).
 # Override with NDW_SITES="hrl=...,hrr=...,vwd=...,vwa=..."
 DEFAULT_SITES = {
     "hrl": "RWS01_MONIBAS_0271hrl0063ra",

@@ -1,7 +1,7 @@
 """Day 4 model tests. Run: pytest -v
 
 The first two tests need the real model.pkl in the project folder (copied from out/ after
-training). Until you've trained, they are skipped, not failed.
+training). Before the first training run they are skipped, not failed.
 """
 import os
 import sys

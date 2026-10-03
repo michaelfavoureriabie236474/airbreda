@@ -14,8 +14,8 @@ import pandas as pd
 
 MODEL_PATH = os.environ.get("MODEL_PATH", "model.pkl")
 
-# Exceedance threshold in µg/m³. DECISION FOR ADR-006 (yours to confirm or change):
-# default 40 = the EU annual limit value for NO2. It is an ANNUAL average applied here to
+# Exceedance threshold in µg/m³ (see ADR-006).
+# Default 40 = the EU annual limit value for NO2. It is an ANNUAL average applied here to
 # HOURLY predictions, which must be stated as a limitation.
 THRESHOLD_UG_M3 = float(os.environ.get("NO2_THRESHOLD", "40"))
 STEEPNESS = 0.2  # from the Day 4 example: how fast risk rises around the threshold

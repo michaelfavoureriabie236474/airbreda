@@ -1,4 +1,4 @@
-"""Day 1 Lab 1: first test (exactly the course example, adapted to our function name)."""
+"""Day 1 Lab 1: first test (the course example, adapted to my function name)."""
 import os
 import sys
 

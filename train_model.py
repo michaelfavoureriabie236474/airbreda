@@ -2,7 +2,7 @@
 
 Input:  out/training_data.csv  (from build_training_data.py)
 Output: out/model.pkl          (baked into the dashboard image afterwards)
-        out/model_report.json  (the numbers you quote in ADR-006: rows, R2, MAE, coefficients)
+        out/model_report.json  (rows, R2, MAE and coefficients, reported in ADR-006)
 
 Why linear regression: we have at most a few dozen hourly rows. A more complex model
 (random forest, neural network) would just memorise noise and be harder to debug. (Day 4.)
